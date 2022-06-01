@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxl.mapper.CommentMapper">
+
+    <select id="queryCommentByCommentId" resultType="BlogComments">
+        select * from `blogcomments` where commentId = #{commentId}
+    </select>
+
+    <select id="queryCommentByArticleId" resultType="BlogComments">
+        select * from `blogcomments` where articleId = #{articleId}
+    </select>
+
+    <select id="queryCommentByArticleIdAndUserId" resultType="BlogComments">
+        select * from `blogcomments` where articleId = #{articleId} and userId=#{userId}
+    </select>
+
+    <insert id="addComment" parameterType="BlogComments">
+        insert into `blogcomments`(articleId,commentContent,userId,commentDate,userJpg,userName)
+        values(#{articleId},#{commentContent},#{userId},#{commentDate},#{userJpg},#{userName})
+    </insert>
+
+    <delete id="deleteComment">
+        delete from `blogcomments` where commentId=#{commentId}
+    </delete>
+
+    <!--  连表查询，查询角色的头像以及角色名字，便于评论列表中使用 -->
+    <select id="queryImgAddress" resultType="String">
+        select userJpg from blogcomments
+                join `user` on blogcomments.userId = user.userId
+                where blogcomments.userId=#{userId}
+    </select>
+
+    <select id="queryUserName" resultType="String">
+        select userName from blogcomments
+                join `user` on blogcomments.userId = user.userId
+                where blogcomments.userId=#{userId}
+    </select>
+
+
+</mapper>

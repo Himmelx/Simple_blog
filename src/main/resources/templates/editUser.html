@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户信息</title>
+
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" href="../static/css/layui.css">
+</head>
+<body>
+<!-- 表单的action为保存用户 -->
+<div class="layui-form" id="editUser">
+    <!--  隐藏域，保存用户id,传到后端修改    -->
+    <input name="userId" id="userId" type="hidden">
+    <br>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label required">用户名:</label>
+        <div class="layui-input-block">
+            <input type="text" id="userName" value="" name="userName" class="layui-input">
+        </div>
+    </div>
+
+    <input name="userPassword" id="userPassword" type="hidden">
+
+    <!--************这里是上传图片的代码***************-->
+    <!--************这里添加的隐藏的输入框，用来传递images的参数，将其传到数据库***************-->
+    <input type="hidden" name="userJpg" id="userJpg" class="image">
+    <div class="layui-form-item">
+        <label class="layui-form-label ">头像:</label>
+        <div class="layui-upload">
+            <button type="button" class="layui-btn" id="test1">上传头像</button>
+            <div class="layui-upload-list">
+                <img src="" id="img" style="width: 90px;height: 90px;margin-left: 180px;" class="layui-upload-img">
+                <p id="demoText"></p>
+            </div>
+        </div>
+    </div>
+    <!--************上面里是上传图片的代码***************-->
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">个性签名:</label>
+        <div class="layui-input-block">
+            <input type="text" name="userSign" id="userSign" autocomplete="off" class="layui-input password">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">QQ:</label>
+        <div class="layui-input-block">
+            <input type="text" name="qq" id="qq"  autocomplete="off" class="layui-input password">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">微信:</label>
+        <div class="layui-input-block">
+            <input  type="text" name="wechat" id="wechat" autocomplete="off" class="layui-input password">
+        </div>
+    </div>
+
+    <br>
+
+</div>
+
+
+<script src="/layui/layui.js" th:inline="javascript" charset="utf-8"></script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述 JS 路径需要改成你本地的 -->
+<script>
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1'
+            ,url: '/upload/'
+            ,accept:'images'
+            ,size:50000
+            ,before: function(obj){
+
+                obj.preview(function(index, file, result){
+
+                    $('#img').attr('src', result);
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败');
+                }
+                //上传成功
+                let demoText = $('#demoText');
+                demoText.html('<span style="margin-left:195px;color: #4cae4c;">上传成功</span>');
+
+                let fileupload = $(".image");
+                fileupload.attr("value",res.data.src);
+                console.log(fileupload.attr("value"));
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="margin-left:195px;color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+
+
+    });
+</script>
+
+</body>
+</html>

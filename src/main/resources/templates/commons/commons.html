@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th=http://www.thymeleaf.org>
+
+<!--公共页面提取：实现代码的复用-->
+
+<!--个人空间上导航栏-->
+<div th:fragment="topbar" class="layui-layout layui-layout-admin" style="position: relative;">
+    <div class="layui-header" style="position: relative;">
+
+
+        <div class="layui-logo layui-hide-xs layui-bg-black" style="width: 360px" >
+            <i style="color: aqua;">X•H</i>
+        </div>
+        <!-- 头部区域（可配合layui 已有的水平导航） -->
+        <ul class="layui-nav layui-layout-left" style="left: 360px">
+
+            <li class="layui-nav-item layui-hide-xs">
+                <a th:href="@{/toHome}">首页</a>
+            </li>
+
+            <li class="layui-nav-item layui-hide-xs">
+                <a th:href="@{/toUserSpace}">个人空间</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs">
+                <a th:href="@{/Article/toWriteBlog}">写博客</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs">
+                <a th:href="@{/Article/allArticles}">站内博客</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs">
+                <a th:href="@{/Article/classifyArticles}">分类</a>
+            </li>
+            <li class="layui-nav-item layui-hide-xs">
+                <a id="about" href="javascript:;">关于</a>
+            </li>
+
+            <li class="layui-nav-item">
+                <a href="javascript:;">More</a>
+                <dl class="layui-nav-child">
+                    <dd><a id="authorInfo" href="#">作者信息</a></dd>
+                    <dd><a id="authorMessage" href="#">作者留言</a></dd>
+                </dl>
+            </li>
+        </ul>
+
+        <div style="display: inline-block;width: 400px;float: right;margin:19px 245px 0 0;" class="row">
+            <!--  这里需要一个搜索框，以及将搜索框变宽这个问题 class="col-lg-6" -->
+            <div style="width: 80%;margin:-3.5px 0 0 72px;" >
+                <form th:action="@{/Article/searchBlog}" method="post" class="input-group">
+                    <input id="content" name="Title" type="text" class="form-control" placeholder="请输入内容">
+                    <span class="input-group-btn">
+                            <button class="btn btn-default">搜索</button>
+                    </span>
+                </form>
+            </div>
+        </div>
+
+        <!--  头像，用户名，以及注销功能      -->
+        <ul class="layui-nav layui-layout-right">
+            <img th:src="${user.getUserJpg()}" style="margin-right: -10px" class="layui-nav-img">
+            <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+                <a th:text="${user.getUserName()}" href="javascript:;">
+                    <!-- 登录名-->
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a th:href="@{/toUpdateInfo}">修改资料</a></dd>
+                    <dd><a th:href="@{/logout}">注销</a></dd>
+                </dl>
+            </li>
+            <!--      -->
+            <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+                <a href="javascript:;">
+                    <i class="layui-icon layui-icon-more-vertical"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <script>
+        function about(){
+            alert("本站坚决拥护共产主义，严厉打击损害党的信誉的行为，" +
+                "禁止发布反党反国家的言论，禁止发布黄赌毒相关信息，" +
+                "美好网站需要你我共同维护," +
+                "谢谢大家的支持！");
+        }
+        document.getElementById("about").onclick=about;
+
+        function  message(){
+            alert("祝大家每天都有一个好心情~ ~");
+        }
+        document.getElementById("authorMessage").onclick=message;
+
+        function authorInfo(){
+            alert("作者QQ：1341531023" +
+                 ",作者微信：xxl1341531023");
+        }
+        document.getElementById("authorInfo").onclick=authorInfo;
+
+
+    </script>
+</div>
+
+<!-- 个人空间左导航栏 -->
+<div th:fragment="sidebar" class="navLeft">
+    <!-- 个人空间左导航栏上面灰 -->
+    <div class="navLeftTop">
+        <!-- 头像 -->
+        <div class="circlePortrait">
+            <img th:src="${user.getUserJpg()}" title="个人头像">
+        </div>
+
+    </div>
+
+    <!-- 个人空间左导航栏下面白 -->
+    <div class="navLeftButton" >
+        <!-- 用户名 -->
+        <p th:text="${user.getUserName()}" class="username">Galaxy</p>
+
+        <!-- 个性签名 -->
+        <p th:text="${user.getUserSign()}" class="sign">群山听懂我悲欢</p>
+
+        <!-- 修改资料 -->
+        <div class="modify">
+            <a th:href="@{/toUpdateInfo}">修改资料</a> | <a th:href="@{/Article/toWriteBlog}">写博客</a>
+        </div>
+
+        <!-- qq以及微信 -->
+        <div class="moreInfo">
+            <img th:src="@{/img/qq.jpg}" alt="qq"  th:title="${user.getQq()}">
+            <img th:src="@{/img/wechat.jpg}" alt="微信" th:title="${user.getWechat}">
+        </div>
+
+    </div>
+</div>
+
+
+
+</html>

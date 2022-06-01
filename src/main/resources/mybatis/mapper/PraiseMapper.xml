@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxl.mapper.PraiseMapper">
+
+    <insert id="addPraise">
+        insert into `praise`(userId,articleId) values(#{userId},#{articleId})
+    </insert>
+    
+    <delete id="deletePraise">
+        delete from `praise` where userId=#{userId} and articleId=#{articleId}
+    </delete>
+
+    <select id="selectArticleIdByUserId" resultType="Int">
+        select articleId from `praise` where userId = #{userId}
+    </select>
+    
+</mapper>

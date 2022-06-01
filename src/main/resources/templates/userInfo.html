@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户信息</title>
+
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" href="../static/css/layui.css">
+    <style>
+        body {
+            background-repeat: no-repeat;
+            background-size:100%;
+            background-position: 0 -50px;
+        }
+        form {
+            margin: 100px auto 0;
+            width: 700px;
+            background-color: #ffffff;
+            opacity:0.75;
+            padding-top: 30px;
+        }
+    </style>
+</head>
+<body th:style="'background-image: url(/img/赤月.jpg);'">
+    <!-- 表单的action为保存用户 -->
+    <form class="layui-form" action="/toUpdateUser" method="post" >
+        <!--  隐藏域，保存用户id,传到后端修改    -->
+        <input th:value="${user.getUserId()}" name="userId" type="hidden">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名:</label>
+            <div class="layui-input-block">
+                <input th:value="${user.getUserName()}" type="text" name="userName"  autocomplete="off" class="layui-input username">
+            </div>
+        </div>
+    
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码:</label>
+            <div class="layui-input-block">
+                <input th:value="${user.getUserPassword()}" type="text" name="userPassword" lay-verify="password" autocomplete="off" class="layui-input password">
+            </div>
+        </div>
+
+        <!--************这里是上传图片的代码***************-->
+        <!--************这里添加的隐藏的输入框，用来传递images的参数，将其传到数据库***************-->
+        <input type="hidden" th:value="${user.getUserJpg()}" name="userJpg" class="image">
+        <div class="layui-form-item">
+            <label class="layui-form-label ">头像:</label>
+            <div class="layui-upload">
+                <button type="button" class="layui-btn" id="test1">上传头像</button>
+                <div class="layui-upload-list">
+                    <img th:src="${user.getUserJpg()}" style="width: 90px;height: 90px;margin-left: 180px;" class="layui-upload-img" id="demo1">
+                    <p id="demoText"></p>
+                </div>
+            </div>
+        </div>
+        <!--************上面里是上传图片的代码***************-->
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">个性签名:</label>
+            <div class="layui-input-block">
+                <input th:value="${user.getUserSign()}"  type="text" name="userSign"  autocomplete="off" class="layui-input password">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">QQ:</label>
+            <div class="layui-input-block">
+                <input th:value="${user.getQq()}"   type="text" name="qq"  autocomplete="off" class="layui-input password">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">微信:</label>
+            <div class="layui-input-block">
+                <input th:value="${user.getWechat()}"  type="text" name="wechat"  autocomplete="off" class="layui-input password">
+            </div>
+        </div>
+
+        <br>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn layui-btn-radius layui-btn-normal" lay-submit="" lay-filter="demo1">修改</button>
+                <a th:href="@{/toUserSpace}" class="layui-btn layui-btn-radius  layui-btn-danger" >返回</a>
+            </div>
+        </div>
+        <br>
+    </form>
+
+    
+    <script src="/layui/layui.js" th:inline="javascript" charset="utf-8"></script>
+    <!-- 注意：如果你直接复制所有代码到本地，上述 JS 路径需要改成你本地的 -->
+    <script>
+        layui.use('upload', function(){
+            var $ = layui.jquery
+                ,upload = layui.upload;
+    
+            //普通图片上传
+            var uploadInst = upload.render({
+                elem: '#test1'
+                ,url: '/upload/'
+                ,accept:'images'
+                ,size:50000
+                ,before: function(obj){
+    
+                    obj.preview(function(index, file, result){
+    
+                        $('#demo1').attr('src', result);
+                    });
+                }
+                ,done: function(res){
+                    //如果上传失败
+                    if(res.code > 0){
+                        return layer.msg('上传失败');
+                    }
+                    //上传成功
+                    let demoText = $('#demoText');
+                    demoText.html('<span style="margin-left:195px;color: #4cae4c;">上传成功</span>');
+    
+                    let fileupload = $(".image");
+                    fileupload.attr("value",res.data.src);
+                    console.log(fileupload.attr("value"));
+                }
+                ,error: function(){
+                    //演示失败状态，并实现重传
+                    var demoText = $('#demoText');
+                    demoText.html('<span style="margin-left:195px;color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                    demoText.find('.demo-reload').on('click', function(){
+                        uploadInst.upload();
+                    });
+                }
+            });
+    
+    
+        });
+    </script>
+     
+</body>
+</html>

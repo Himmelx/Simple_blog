@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>后台管理系统</title>
+  <link rel="stylesheet" th:href="@{/layui/css/layui.css}" href="../static/css/layui.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-y: hidden;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo layui-hide-xs layui-bg-black" > <i style="color: aqua;">X•H Manager</i> </div>
+
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+        <a href="javascript:;">
+          <img th:src="@{/img/猫1.jpg}" class="layui-nav-img">
+          管理员
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a th:href="@{/logout}">注销</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+        <a href="javascript:;">
+          <i class="layui-icon layui-icon-more-vertical"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree" lay-filter="test">
+        <li class="layui-nav-item layui-nav-itemed">
+          <a th:href="@{/manager/toManager}">用户操作</a>
+        </li>
+        <li class="layui-nav-item">
+          <a th:href="@{/manager/toBlogTotal}">博客总览</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="layui-body">
+
+    <!-- 内容主体区域 lay-filter用户layui操作数据 -->
+    <table class="layui-hide" id="userTable" lay-filter="userTable">
+    </table>
+
+    <div id="userBar" style="display:none;">
+      <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+      <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </div>
+
+  </div>
+
+  <div class="layui-footer">
+    <!-- 底部固定区域 -->
+    管理员后台管理
+  </div>
+</div>
+
+<!--<script type="text/html" id="toolbarDemo">-->
+<!--  <div class="layui-btn-group">-->
+<!--    <button class="layui-btn layui-btn-sm" lay-event="add"><i class="layui-icon">&#xe654;</i>新增</button>-->
+<!--    <button class="layui-btn layui-btn-sm" lay-event="updata"><i class="layui-icon">&#xe642;</i>修改</button>-->
+<!--    <button class="layui-btn layui-btn-sm" lay-event="delete"><i class="layui-icon">&#xe640;</i>删除</button>-->
+<!--  </div>-->
+<!--</script>-->
+
+<script src="/layui/layui.js" th:inline="javascript"></script>
+<script>
+  //JS
+  layui.use(['element', 'layer', 'util'], function(){
+    var element = layui.element
+            ,layer = layui.layer
+            ,util = layui.util;
+
+    //头部事件
+    util.event('lay-header-event', {
+      //左侧菜单事件
+      menuLeft: function(othis){
+        layer.msg('展开左侧菜单的操作', {icon: 0});
+      }
+    });
+  });
+
+</script>
+
+<script>
+  layui.use(['table','jquery','layer','form'], function(){
+    var table = layui.table;
+    var $=layui.jquery;
+    var form=layui.form;
+    var layer=layui.layer;
+    //渲染数据表格
+    table.render({
+      elem: '#userTable'     //渲染的目标对象
+      ,url:'/manager/getUsrList'     //数据接口
+      ,title: '用户数据表'     //数据导出时的标题
+      ,toolbar:"#toolbarDemo"    //表头工具条
+      ,defaultToolbar:['filter', 'print', 'exports']
+      ,done:function(res,curr,count){
+        // alert(res);//后台url返回的json字符串
+      }
+      ,totalRow:true//开启合并行
+      ,text:{
+        none:'暂无相关数据'//默认:无数据
+      }
+      ,id: "user"
+      ,page: true           //是否启用分页
+      ,cols: [
+              [               //列表数据
+        // {type: 'checkbox', fixed: 'left',LAY_CHECKED:'true'},
+        {field:'userId', title:'ID', width:80,sort:true}
+        ,{field:'userName', title:'用户名', width:120}
+        ,{field:'userJpg', title:'头像', width:60,templet: "#imgtmp",align: "center"}
+        ,{field:'userSign', title:'个性签名', width:180}
+        ,{field:'qq', title:'QQ', width:130}
+        ,{field:'wechat', title:'微信',width:130}
+        ,{fixed: 'right', title:'操作', toolbar: '#userBar', width:150}
+        ]
+      ]
+      ,
+    });
+
+    //监听表格复选框选择,根lay-filter来选择
+    table.on('checkbox(userTable)', function(obj){
+      console.log(obj);
+    });
+
+    //监听工具条
+    table.on('tool(userTable)', function(obj){
+      let data = obj.data;
+      // console.log(data)
+      //用户点了删除的操作
+      if(obj.event === 'del'){
+        layer.confirm('真的删除行么', function(index){
+          // console.log(data);
+          $.ajax({
+            url: "/manager/deleteUser",
+            type: "POST",
+            data:{"userId":data.userId},
+            // dataType: "json",
+            success: function(data){
+              if(data.state===1){
+                //删除这一行
+                obj.del();
+                //关闭弹框
+                layer.close(index);
+                layer.msg("删除失败", {icon: 5});
+              }else{
+                layer.msg("删除成功", {icon: 6});
+              }
+              window.location.reload();
+            }
+
+          });
+        });
+      } else if(obj.event === 'edit'){
+            //实现编辑的功能
+            layer.open({
+              type:2
+              ,title: '编辑用户信息'
+              ,content: "/manager/toEditUser"
+              ,maxmin: true
+              ,area: ['500px','500px']
+              ,btn: ['确定','取消']
+              ,yes:function (index,layero){
+                //回调的数值
+                let userId = $(layero).find('iframe')[0].contentWindow.document.getElementById('userId').value;
+                let userName = $(layero).find('iframe')[0].contentWindow.document.getElementById('userName').value;
+                let userPassword = $(layero).find('iframe')[0].contentWindow.document.getElementById('userPassword').value;
+                let userJpg = $(layero).find('iframe')[0].contentWindow.document.getElementById('userJpg').value;
+                let userSign = $(layero).find('iframe')[0].contentWindow.document.getElementById('userSign').value;
+                let qq = $(layero).find('iframe')[0].contentWindow.document.getElementById('qq').value;
+                let wechat = $(layero).find('iframe')[0].contentWindow.document.getElementById('wechat').value;
+                // console.log('图片地址--->'+userJpg);
+                //同步数据表格的数据
+                obj.update({
+                  'userId':userId,
+                  'userName':userName,
+                  'userPassword':userPassword,
+                  'userJpg':userJpg,
+                  'userSign':userSign,
+                  'qq':qq,
+                  'wechat':wechat
+                })
+
+                $.ajax({
+                  url:'/manager/editUser',
+                  type:'POST',
+                  dataType: 'json',
+                  data: {
+                    //返回后端的数据
+                    'userId':userId,
+                    'userName':userName,
+                    'userPassword':userPassword,
+                    'userJpg':userJpg,
+                    'userSign':userSign,
+                    'qq':qq,
+                    'wechat':wechat
+                  },
+                  success:function(res){
+                    if (res.state===1)
+                      layer.msg('编辑成功');
+                  },
+                  error:function (res){
+                    layer.msg('编辑失败');
+                  }
+                })
+                //关闭弹出层
+                layer.close(index);
+              }
+              ,success:function (layero,index){
+                //通过id找到html里面这个最外层的元素，实现编辑的时候数据回显
+                // let div = layero.find('iframe').contents().find('#editUser');
+                let body = layer.getChildFrame('body',index);
+                body.find('#userId').val(data.userId);
+                body.find("input[name=userName]").val(data.userName);
+                body.find('#userPassword').val(data.userPassword);
+                body.find('#userJpg').val(data.userJpg);
+                body.find('#img').attr('src',data.userJpg);
+                body.find('#userSign').val(data.userSign);
+                body.find('#qq').val(data.qq);
+                body.find('#wechat').val(data.wechat);
+              }
+            })
+        }
+    });
+
+
+  });
+
+</script>
+
+<script type="text/html" id="imgtmp">
+  <img style="height:28px;width:28px;border-radius:50%;" src="{{d.userJpg}}" />
+</script>
+
+</body>
+</html>

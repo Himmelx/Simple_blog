@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>站内博客</title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <!-- 个人主页的css样式 -->
+    <link rel="stylesheet" th:href="@{/css/userNavLeft.css}">
+    <link rel="stylesheet" th:href="@{/css/userArticle.css}">
+
+    <style>
+        body {
+            background-repeat: no-repeat;
+            background-size:100%;
+            background-position: 0 -50px;
+        }
+    </style>
+</head>
+<body th:style="'background-image: url(/img/赤月.jpg);'">
+<!--background-color: #eaeaea;"-->
+
+<!--	头部导航栏，引用	-->
+<div th:replace="~{commons/commons::topbar}"></div>
+
+<!-- 左导航栏，引用-->
+<div th:replace="~{commons/commons::sidebar}"></div>
+
+
+<!-- 文章展示页面 -->
+<!-- 这里这个th:fragment理解为一个代码模块，thymeleaf根据这个进行一个定位 -->
+<div class="panel panel-default article" style="opacity:0.75;">
+
+    <!-- Default panel contents -->
+    <div  class="panel-heading" style="position: relative;color: #ff229c;font-size: 18px;">搜索内容
+    </div>
+
+    <!-- 这里进行Ajax异步请求刷新   -->
+    <div id="articles" th:fragment="article_list">
+        <!-- 文章列表  从数据库中取出-->
+        <ul class="list-group" style="position: relative;margin-bottom: 0;" th:each="article:${articleList}">
+            <li  class="list-group-item" >
+                <!--suppress ThymeleafVariablesResolveInspection -->
+                <a  th:href="@{'/Article/contentDetail/'+${article.getArticleId()}}"
+                    th:text="${article.getArticleTitle()}" style="font-size: 18px"
+                    target="_blank" th:onclick="increase([[${article.getArticleId()}]])">
+                </a>
+
+                <!-- 文章摘要 -->
+                <p style="margin:3px 10px 3px;font-size: 14px" th:text="${article.getArticleAbstract()}"></p>
+                <span th:text="${'发布日期:'+article.getWriteDate()}"></span>
+                <div style="display: inline;margin-left: 240px">
+                    <i class="layui-icon layui-icon-note" style="color: #00FF00"></i>
+                    <span th:text="${'类型:'+article.getArticleType()}"></span>
+                </div>
+
+                <a th:id="${article.getArticleId()}" th:name="praiseHref" th:onclick="praise([[${article.getArticleId()}]])"
+                   href="#" style="display: inline;margin-left: 280px;color: black">
+                    <i class="layui-icon layui-icon-heart-fill"></i>
+                    <sapn>点赞</sapn>
+                    <span th:text="${article.getLove()}"></span>
+                </a>
+
+                <div style="display: inline;">
+                    <i class="glyphicon glyphicon-eye-open"></i>
+                    <sapn>浏览</sapn>
+                    <span th:id="viewNum+${article.getArticleId()}" th:text="${article.getView()}"></span>
+                </div>
+
+                <div style="display: inline;position: absolute;right: 24px;top:10px">
+                    <i class="layui-icon layui-icon-username"></i>
+                    <span th:text="${'作者:'+'('+article.getUserName()}+')'"></span>
+                </div>
+
+            </li>
+        </ul>
+    </div>
+    <!-- 放置分页的按钮  -->
+    <div id="test1"></div>
+
+</div>
+
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/layui/layui.js" th:inline="none" >
+    //JS
+    layui.use(['element'], function(){
+        let util = layui.util
+        //头部事件
+        util.event('lay-header-event');
+
+    });
+</script>
+
+<script>
+
+    let total = 0;
+    let limit = 5;
+
+    //获取列表总数量，进入的时候要先获取数量，搜索的时候获取新的
+    $.ajax({
+        url: '[[@{/Article/searchCount/?Title=}]]' + '[[${Title}]]',
+        type: "POST",
+        async: false,
+        cache: false,
+        success: function (data) {
+            if(data != null){
+                console.log(data);
+                total = data;
+            }
+        }
+    });
+
+    //分页
+    layui.use("laypage", function () {
+        let laypage = layui.laypage;
+
+        //执行一个laypage实例
+        laypage.render({
+            elem: "test1",    //注意，这里的 pageDiv 是 ID，不用加 # 号
+            count: total,     //数据总数，从服务端得到
+            limit: limit,     //页面展示数据条数
+            theme: "33ccff",  //主题样式
+            jump: function (obj, first) {
+                if (!first) {        //如果不是第一次进入
+                    console.log("laypage里面的总数"+total);
+                    $.ajax({
+                        //获取总数量，下一页过后就将路径后面加搜索的参数，从而返回新的值
+                        url: '[[@{/Article/pageSearch?Title}]]'+'[[${Title}]]',
+                        type: "POST",
+                        async: false,
+                        data: {"sql_page": obj.curr},
+                        success: function (data) {
+                            if (data != null) {
+                                // console.log(data);
+                                $("#articles").html(data);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+
+    //浏览次数加一的js
+    increase = function(articleId){
+        // console.log("文章id--->"+articleId);
+        // console.log(document.getElementById('viewNum4'))
+        let viewNum = parseInt(document.getElementById('viewNum'+articleId).innerHTML);
+        $.ajax({
+            url: "/Article/view",
+            data: {'articleId': articleId},
+            type: "POST",
+            success: function (data){
+                if(data===1)
+                    document.getElementById('viewNum'+articleId).innerHTML = viewNum+1;
+            }
+        })
+    }
+
+    //实现页面加载时候就将点赞按钮变红
+    let praiseHref = document.getElementsByName("praiseHref");
+    // console.log(praiseHref);
+    let praises = [[${praises}]];
+    console.log(praises);
+    for(let i=0;i<praiseHref.length;i++){
+        let attribute = praiseHref[i].getAttribute('id');
+        if (jQuery.inArray(parseInt(attribute),praises)!==-1){
+            praiseHref[i].style.color = 'red';
+        }
+    }
+
+    //实现点赞功能
+    praise = function (articleId){
+        let elementById = document.getElementById(articleId);
+        //如果已经点赞过再点赞就是取消点赞
+        if (elementById.style.color==='red') {
+            $.ajax({
+                url: '/Article/praise?type=decrease',
+                type: 'post',
+                data: {'articleId':articleId,'userId':[[${user.getUserId()}]]},
+                success: function (data){
+                    if (data>0){
+                        //将数量减一显示
+                        elementById.style.color = 'black';
+                        elementById.children[2].innerHTML = parseInt(elementById.children[2].innerHTML)-1;
+                        // console.log(lastChild);
+                    }else
+                        alert("点赞失败！");
+                }
+            })
+        }else{
+            $.ajax({
+                url: '/Article/praise?type=increase',
+                type: 'post',
+                data: {'articleId':articleId,'userId':[[${user.getUserId()}]]},
+                success: function (data){
+                    if (data>0){
+                        //将数量加一显示
+                        elementById.style.color = 'red';
+                        elementById.children[2].innerHTML = parseInt(elementById.children[2].innerHTML)+1;
+                    }else
+                        alert("点赞失败！");
+                }
+            })
+        }
+
+    }
+
+
+</script>
+</body>
+</html>

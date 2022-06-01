@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxl.mapper.ArticleMapper">
+
+    <select id="getArticleList" resultType="BlogArticle">
+        select * from `blogarticle`
+    </select>
+
+    <select id="queryArticleById" resultType="BlogArticle">
+        select * from `blogarticle` where articleId = #{articleId}
+    </select>
+
+    <select id="queryArticleByUserId" resultType="BlogArticle">
+        select * from `blogarticle` where userId = #{userId} limit #{page},5
+    </select>
+
+    <select id="queryArticleByPageAndLimit" resultType="BlogArticle">
+        select * from `blogarticle` limit #{page},#{limit}
+    </select>
+
+    <select id="queryArticleByTitle" resultType="BlogArticle">
+        select * from `blogarticle` where articleTitle = #{articleTitle}
+    </select>
+
+    <select id="queryArticleLikeTitle" resultType="BlogArticle">
+        select * from `blogarticle` where articleTitle like CONCAT('%',#{articleTitle},'%') limit #{page},5
+    </select>
+
+    <select id="queryArticleByType" resultType="BlogArticle">
+        select * from `blogarticle` where  articleType = #{articleType}
+    </select>
+
+    <insert id="addArticle" parameterType="BlogArticle">
+        insert into `blogarticle`(userId,articleTitle,articleType,articleAbstract,writeDate,userName)
+        values(#{userId},#{articleTitle},#{articleType},#{articleAbstract},#{writeDate},#{userName})
+    </insert>
+
+    <update id="updateArticleByLove" >
+        update `blogarticle` set love=#{love}
+                           where articleId=#{articleId}
+    </update>
+
+    <update id="updateArticleByView" parameterType="BlogArticle">
+        update `blogarticle` set view=#{view}
+                                 where articleId=#{articleId}
+    </update>
+
+    <delete id="deleteArticle">
+        DELETE `blogarticle`,`blogarticlecontent`,blogcomments
+        FROM `blogarticle`
+        LEFT OUTER JOIN `blogarticlecontent`
+        ON blogarticle.articleId = blogarticlecontent.articleId
+        LEFT OUTER JOIN blogcomments ON blogarticle.articleId = blogcomments.articleId
+        WHERE blogarticle.articleId = #{articleId}
+    </delete>
+
+    <select id="queryArticleByPage" resultType="BlogArticle">
+        select * from `blogarticle`  limit #{page},5;
+    </select>
+
+    <select id="queryAllNumber" resultType="Int">
+        select count(*) from `blogarticle`
+    </select>
+
+    <select id="queryAllNumberByUserId" resultType="Int">
+        select count(*) from `blogarticle` where userId=#{userId}
+    </select>
+
+    <select id="queryAllNumberByTitle" resultType="Int">
+        select count(*) from `blogarticle` where articleTitle like CONCAT('%',#{articleTitle},'%')
+    </select>
+
+    <update id="increaseView">
+        update `blogarticle` set `view`  = `view`+1 where articleId = #{articleId}
+    </update>
+
+    <update id="increaseLove">
+        update `blogarticle` set `love`  = `love`+1 where articleId = #{articleId}
+    </update>
+
+    <update id="decreaseLove">
+        update `blogarticle` set `love`  = `love`-1 where articleId = #{articleId}
+
+    </update>
+
+    <!--  选出热度前三的文章  -->
+    <select id="queryArticleHot" resultType="BlogArticle">
+        select * from `blogarticle` order by (love*20+`view`) desc limit 0,3
+    </select>
+
+    <update id="updateArticle">
+        update `blogarticle` join `blogarticlecontent` on blogarticle.articleId = blogarticlecontent.articleId
+        set articleContent = #{articleContent},articleTitle = #{articleTitle},
+            articleType = #{articleType},articleAbstract = #{articleAbstract},writeDate = #{writeDate}
+        where blogarticle.articleId = #{articleId}
+    </update>
+
+</mapper>

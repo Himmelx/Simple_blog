@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<!-- 导入thymeleaf命名空间 -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <title>登录</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/login.css" th:href="@{/css/login.css}"/>
+
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="../static/css/base.css" th:href="@{/css/base.css}"/>
+</head>
+<body>
+<div id="login-box">
+    <form th:action="@{/main}" method="post">
+        <h1>Login</h1>
+
+        <!-- 当用户没有登录的时候访问，会显示没有权限登录     -->
+        <div  class="input-box">
+           <p style="color: red" th:text="${msg}"></p>
+        </div>
+        <!--  注册成功    -->
+        <div  class="input-box">
+            <p style="color: greenyellow" th:text="${success}"></p>
+        </div>
+
+        <div class="input-box">
+            <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+            <input type="text" name="username" placeholder="用户名" autocomplete="off" />
+        </div>
+        <div class="input-box">
+            <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+            <input type="password" name="password" lay-verify="password" autocomplete="off"  placeholder="请填写6到12位密码" />
+        </div>
+        <button>Sign in</button>
+    </form>
+    <a th:href="@{/toRegister}" style="font-size: 15px; display: block; margin-top: 15px;">没有账号?立即注册</a>
+</div>
+
+
+</body>
+</html>

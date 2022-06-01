@@ -1,0 +1,10 @@
+.article {
+    position: relative;
+    float: left;
+    top: 40px;
+    left: 320px;
+    width: 930px;
+    background-color: #ffffff;
+    opacity:0.75;
+}
+

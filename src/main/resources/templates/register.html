@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/login.css" th:href="@{/css/login.css}"/>
+
+    <link rel="stylesheet" type="text/css" href="../static/css/base.css" th:href="@{/css/base.css}"/>
+
+</head>
+<body>
+
+    <div id="login-box" style="height: 500px;">
+        <form th:action="@{/Register}" method="post">
+            <h1>Register</h1>
+
+            <!-- 当用户名存在或者输出错误   -->
+            <div class="input-box" style="margin-top: 7px">
+                <p style="color: red" th:text="${error}"></p>
+            </div>
+
+            <div class="input-box" style="margin-top: 7px">
+                请输入用户名：<input type="text" autocomplete="off" name="username"/>
+            </div>
+            <div class="input-box">
+                请输入密码：<input type="password" autocomplete="off" name="password"/>
+            </div>
+
+            <div class="input-box">
+                验证码:<input style="margin-left:20px;" type="text" autocomplete="off" name="code"><br/><br/>
+                <img id="codeImg" alt="验证码" th:src="@{/GenerateCode}"><br/>
+                <br/>
+                <a href="javascript:change();">换一张</a><br/><br/>
+            </div>
+
+            <button style="margin-top: 7px">注册</button>
+            <a th:href="@{/toLogin}" style="font-size: 15px; display: block; margin-top: 15px;">已有账号?立即登录</a>
+        </form>
+    </div>
+
+    <script>
+        //单击更换验证码图片
+        function change(){
+            let t = new Date();
+            document.getElementById("codeImg").src="/GenerateCode?time="+t;
+        }
+    </script>
+
+    
+</body>
+</html>

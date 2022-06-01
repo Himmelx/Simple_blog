@@ -1,0 +1,41 @@
+.article {
+    position: relative;
+    top: 20px;
+    left: 220px;
+    width: 1150px;
+    opacity:65%;
+}
+
+.layui-carousel a {
+    background-repeat: no-repeat;
+    background-size:100%;
+    /*background-position: 0 -50px;*/
+}
+
+hr {
+    margin: 0 0;
+}
+
+.layui-card {
+    opacity: 0.65;
+}
+
+.layui-card-body {
+    padding: 0px 15px;
+    line-height: 54px;
+    font-size: 14px;
+}
+
+.layui-card-body img {
+    width:35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+.span1 {
+    position: absolute;top: -8px;left: 75px;font-size: 14px;color: black;
+}
+
+.span2 {
+    position: absolute;left:75px;top:12px;text-overflow: ellipsis;font-size: 11px;
+}

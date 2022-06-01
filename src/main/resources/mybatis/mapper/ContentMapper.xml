@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xxl.mapper.ContentMapper">
+
+    <select id="getContentList" resultType="BlogArticleContent">
+        select * from `blogarticlecontent`
+    </select>
+
+    <select id="queryContentByContentId" resultType="BlogArticleContent">
+        select * from `blogarticlecontent` where contentId = #{contentId}
+    </select>
+
+    <select id="queryContentByArticleId" resultType="BlogArticleContent">
+        select * from `blogarticlecontent` where articleId = #{articleId}
+    </select>
+
+    <insert id="addBlogContent">
+        insert into `blogarticlecontent`(articleId,articleContent)
+        values(#{articleId},#{articleContent})
+    </insert>
+
+    <update id="updateBlogContent" >
+        update `blogarticlecontent` set articleContent=#{articleContent}
+        where contentId=#{contentId}
+    </update>
+
+    <delete id="deleteBlogContent">
+        delete from `blogarticlecontent` where contentId=#{contentId}
+    </delete>
+
+</mapper>
