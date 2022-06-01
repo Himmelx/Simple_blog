@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@EnableTransactionManagement  //开启mybatis的事务支持
+@EnableTransactionManagement  //开启mybatis的事务支持 ~~
 @SpringBootApplication
 public class KcsjApplication {
 
